@@ -22,9 +22,15 @@ abstract class SAPConnector implements ISAPConnector
     protected array $selectProperties = [];
     protected string $filter = '';
     protected string $top = '';
+    protected bool $all = false;
 
-    function __construct()
+    function __construct($connectionConfig = [])
     {
+        if(empty($connectionConfig)){
+            $this->loadCredentialsFromEnvironment();
+        }else{
+            $this->loadCredentialsFromArry($connectionConfig);
+        }
         $this->sapClient = new Client(['verify' => false]);
     }
 
@@ -36,7 +42,7 @@ abstract class SAPConnector implements ISAPConnector
      */
     abstract protected function defaultSelect(): array;
 
-    public function loadCredentialsFromEnvironment(): void
+    private function loadCredentialsFromEnvironment(): void
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
         $dotenv->load();
@@ -44,7 +50,7 @@ abstract class SAPConnector implements ISAPConnector
         $this->loadCredentialsFromArry($_ENV);
     }
 
-    public function loadCredentialsFromArry(array $data)
+    private function loadCredentialsFromArry(array $data)
     {
         $this->host = $data['SAP_HOST'];
         $this->port = $data['SAP_PORT'];
@@ -93,6 +99,9 @@ abstract class SAPConnector implements ISAPConnector
     {
         $res = $this->sapClient->post($this->getLoginUrl(), ['json' => $this->getCredentials()]);
         $this->sessionLogin['Cookie'] = implode(';',$res->getHeader('Set-Cookie'));
+        if($this->all)
+            $this->sessionLogin['Prefer'] = 'odata.maxpagesize=0';
+        $this->all = false;
     }
 
     /**
@@ -127,17 +136,21 @@ abstract class SAPConnector implements ISAPConnector
         $filter = '';
         if($this->filter != '')
             $filter = '&$filter=' . $this->filter;
+        $this->filter = '';
         return $filter;
     }
 
     private function top(): string
     {
-        return $this->top;
+        $top = $this->top;
+        $this->top = '';
+        return $top;
     }
 
     public function getAll(): array
     {
-        return $this->request('GET', $this->buildUrl($this->endpoint()));
+        $this->all = true;
+        return $this->request('GET', $this->buildUrl($this->endpoint()))['value']??[];
     }
 
     public function getOneByKey($key): array
@@ -148,6 +161,7 @@ abstract class SAPConnector implements ISAPConnector
     public function getAllByFilter(string $filter): array
     {
         $this->filter = rawurlencode($filter);
+        $this->all = true;
         return $this->getAll();
     }
 

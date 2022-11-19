@@ -7,6 +7,11 @@ use fmarquesto\SapBusinessOneConnector\SAPConnector;
 
 class Items extends SAPConnector
 {
+    public function getOneByKey($key): array
+    {
+        return parent::getOneByKey("'$key'");
+    }
+
     public function update($key, array $data):void
     {
         parent::update("'$key'", $data);
