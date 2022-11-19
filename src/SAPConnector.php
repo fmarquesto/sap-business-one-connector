@@ -25,14 +25,6 @@ abstract class SAPConnector implements ISAPConnector
 
     function __construct()
     {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-        $dotenv->load();
-        $dotenv->required(['SAP_HOST', 'SAP_PORT', 'SAP_USER', 'SAP_PASS', 'SAP_DB']);
-        $this->host = $_ENV['SAP_HOST'];
-        $this->port = $_ENV['SAP_PORT'];
-        $this->user = $_ENV['SAP_USER'];
-        $this->pass = $_ENV['SAP_PASS'];
-        $this->database = $_ENV['SAP_DB'];
         $this->sapClient = new Client(['verify' => false]);
     }
 
@@ -43,6 +35,23 @@ abstract class SAPConnector implements ISAPConnector
      * @return array
      */
     abstract protected function defaultSelect(): array;
+
+    public function loadCredentialsFromEnvironment(): void
+    {
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+        $dotenv->load();
+        $dotenv->required(['SAP_HOST', 'SAP_PORT', 'SAP_USER', 'SAP_PASS', 'SAP_DB']);
+        $this->loadCredentialsFromArry($_ENV);
+    }
+
+    public function loadCredentialsFromArry(array $data)
+    {
+        $this->host = $data['SAP_HOST'];
+        $this->port = $data['SAP_PORT'];
+        $this->user = $data['SAP_USER'];
+        $this->pass = $data['SAP_PASS'];
+        $this->database = $data['SAP_DB'];
+    }
 
     private function getCredentials() :array
     {
