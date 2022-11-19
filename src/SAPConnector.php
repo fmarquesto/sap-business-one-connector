@@ -69,9 +69,12 @@ abstract class SAPConnector implements ISAPConnector
         return $this->getBaseUrl() . 'Logout';
     }
 
-    protected function buildUrl(string $url): string
+    protected function buildUrl(string $url, $get = true): string
     {
-        return $this->getBaseUrl() . $url . "?" . $this->select() . $this->filter() . $this->top();
+        if($get)
+            return $this->getBaseUrl() . $url . "?" . $this->select() . $this->filter() . $this->top();
+
+        return $this->getBaseUrl() . $url;
     }
 
     /**
@@ -91,12 +94,12 @@ abstract class SAPConnector implements ISAPConnector
         $this->sapClient->get($this->getLogoutUrl(),['headers'=>$this->sessionLogin]);
     }
 
-    protected function get(string $url): array
+    protected function request(string $method, string $url, array $data = []): array
     {
         $this->login();
-        $response = $this->sapClient->get($this->buildUrl($url), ['headers'=>$this->sessionLogin]);
+        $response = $this->sapClient->request($method, $url, ['json' => $data, 'headers' => $this->sessionLogin]);
         $this->logout();
-        return json_decode($response->getBody()->__toString(), true);
+        return json_decode($response->getBody()->__toString(), true)??[];
     }
 
     private function select(): string
@@ -125,12 +128,12 @@ abstract class SAPConnector implements ISAPConnector
 
     public function getAll(): array
     {
-        return $this->get($this->endpoint());
+        return $this->request('GET', $this->buildUrl($this->endpoint()));
     }
 
     public function getOneByKey($key): array
     {
-        return $this->get($this->endpoint() . "($key)");
+        return $this->request('GET', $this->buildUrl($this->endpoint() . "($key)"));
     }
 
     public function getAllByFilter(string $filter): array
@@ -147,16 +150,21 @@ abstract class SAPConnector implements ISAPConnector
 
     public function create(array $data): array
     {
-        // TODO: Implement create() method.
+       return $this->request('POST',$this->buildUrl($this->endpoint(),false), $data);
     }
 
-    public function update($key, $data): void
+    public function update($key, array $data): void
     {
-        // TODO: Implement update() method.
+        $this->request('PATCH', $this->buildUrl($this->endpoint() . "($key)", false), $data);
     }
 
     public function delete($key): void
     {
-        // TODO: Implement delete() method.
+        $this->request('DELETE',$this->buildUrl($this->endpoint() . "($key)", false));
+    }
+
+    public function updateByBatch(array $data): array
+    {
+
     }
 }

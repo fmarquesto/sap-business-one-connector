@@ -18,7 +18,9 @@ interface ISAPConnector
 
     public function create(array $data): array;
 
-    public function update($key, $data): void;
+    public function update($key, array $data): void;
 
     public function delete($key): void;
+
+    public function updateByBatch(array $data): array;
 }
