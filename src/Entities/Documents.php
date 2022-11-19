@@ -2,16 +2,14 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Entities;
 
-use fmarquesto\SapBusinessOneConnector\SAPConnector;
-
-abstract class Documents extends SAPConnector
+abstract class Documents extends Entity
 {
-    protected function key(): string
+    function key(): string
     {
         return 'DocEntry';
     }
 
-    protected function defaultSelect(): array
+    function defaultSelect(): array
     {
         return ['DocEntry', 'DocNum'];
     }

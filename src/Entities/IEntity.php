@@ -1,12 +1,22 @@
 <?php
 
-namespace fmarquesto\SapBusinessOneConnector;
+namespace fmarquesto\SapBusinessOneConnector\Entities;
 
-interface ISAPConnector
+interface IEntity
 {
-    public function setSelect(string $property): ISAPConnector;
+    public function setSelect(string $property): IEntity;
 
-    public function setMultipleSelect(array $properties): ISAPConnector;
+    public function setMultipleSelect(array $properties): IEntity;
+
+    function endpoint(): string;
+
+    function key(): string;
+
+    /**
+     * This should be setted in order to avoid requesting unnecessary data
+     * @return array
+     */
+    function defaultSelect(): array;
 
     public function getAll(): array;
 

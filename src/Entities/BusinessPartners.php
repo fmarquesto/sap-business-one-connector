@@ -2,22 +2,19 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Entities;
 
-use fmarquesto\SapBusinessOneConnector\Common\SelectProperties;
-use fmarquesto\SapBusinessOneConnector\SAPConnector;
-
-class BusinessPartners extends SAPConnector
+class BusinessPartners extends Entity
 {
-    protected function endpoint(): string
+    function endpoint(): string
     {
         return 'BusinessPartners';
     }
 
-    protected function key(): string
+    function key(): string
     {
         return "CardCode";
     }
 
-    protected function defaultSelect(): array
+    function defaultSelect(): array
     {
         return ['CardCode', 'CardName'];
     }

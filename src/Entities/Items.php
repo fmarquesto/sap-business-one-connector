@@ -2,10 +2,7 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Entities;
 
-use fmarquesto\SapBusinessOneConnector\Common\SelectProperties;
-use fmarquesto\SapBusinessOneConnector\SAPConnector;
-
-class Items extends SAPConnector
+class Items extends Entity
 {
     public function getOneByKey($key): array
     {
@@ -22,17 +19,17 @@ class Items extends SAPConnector
         parent::delete("'$key'");
     }
 
-    protected function endpoint(): string
+    function endpoint(): string
     {
         return 'Items';
     }
 
-    protected function key(): string
+    function key(): string
     {
         return "'ItemCode'";
     }
 
-    protected function defaultSelect(): array
+    function defaultSelect(): array
     {
         return ['ItemCode', 'ItemName'];
     }

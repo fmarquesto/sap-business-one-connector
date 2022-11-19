@@ -4,7 +4,7 @@ namespace fmarquesto\SapBusinessOneConnector\Entities;
 
 class DeliveryNoteDocuments extends Documents
 {
-    protected function endpoint(): string
+    function endpoint(): string
     {
         return 'DeliveryNotes';
     }

@@ -1,15 +1,13 @@
 <?php
 
-namespace fmarquesto\SapBusinessOneConnector;
+namespace fmarquesto\SapBusinessOneConnector\Connector;
 
 use Dotenv\Dotenv;
-use fmarquesto\SapBusinessOneConnector\Common\SelectProperties;
+use fmarquesto\SapBusinessOneConnector\Entities\IEntity;
 use GuzzleHttp\Client;
 
-abstract class SAPConnector implements ISAPConnector
+class SAPConnector implements ISAPConnector
 {
-    use SelectProperties;
-
     private static string $baseVersionUrl = '/b1s/v1/';
     private string $host;
     private int $port;
@@ -19,7 +17,6 @@ abstract class SAPConnector implements ISAPConnector
 
     protected Client $sapClient;
     private array $sessionLogin = [];
-    protected array $selectProperties = [];
     protected string $filter = '';
     protected string $top = '';
     protected bool $all = false;
@@ -33,14 +30,6 @@ abstract class SAPConnector implements ISAPConnector
         }
         $this->sapClient = new Client(['verify' => false]);
     }
-
-    abstract protected function endpoint(): string;
-    abstract protected function key(): string;
-    /**
-     * This should be setted in order to avoid requesting unnecessary data
-     * @return array
-     */
-    abstract protected function defaultSelect(): array;
 
     private function loadCredentialsFromEnvironment(): void
     {
@@ -84,12 +73,16 @@ abstract class SAPConnector implements ISAPConnector
         return $this->getBaseUrl() . 'Logout';
     }
 
-    protected function buildUrl(string $url, $get = true): string
+    protected function buildUrl(IEntity $entity, $key = '', $get = true): string
     {
-        if($get)
-            return $this->getBaseUrl() . $url . "?" . $this->select() . $this->filter() . $this->top();
+        $url = $this->getBaseUrl() . $entity->endpoint();
+        if($key!='')
+            $url .="($key)";
 
-        return $this->getBaseUrl() . $url;
+        if($get)
+            $url .= "?" . $this->select($entity) . $this->filter() . $this->top();
+
+        return $url;
     }
 
     /**
@@ -120,13 +113,13 @@ abstract class SAPConnector implements ISAPConnector
         return json_decode($response->getBody()->__toString(), true)??[];
     }
 
-    private function select(): string
+    private function select(IEntity $entity): string
     {
         $select = '$select=';
-        if(count($this->selectProperties) > 0){
-            $select .= implode(',',$this->selectProperties);
+        if(count($entity->selectProperties()) > 0){
+            $select .= implode(',',$entity->selectProperties());
         }else{
-            $select .= implode(',',$this->defaultSelect());
+            $select .= implode(',',$entity->defaultSelect());
         }
         return $select;
     }
@@ -147,47 +140,47 @@ abstract class SAPConnector implements ISAPConnector
         return $top;
     }
 
-    public function getAll(): array
+    public function getAll(IEntity $entity): array
     {
         $this->all = true;
-        return $this->request('GET', $this->buildUrl($this->endpoint()))['value']??[];
+        return $this->request('GET', $this->buildUrl($entity))['value']??[];
     }
 
-    public function getOneByKey($key): array
+    public function getOneByKey(IEntity $entity, $key): array
     {
-        return $this->request('GET', $this->buildUrl($this->endpoint() . "($key)"));
+        return $this->request('GET', $this->buildUrl($entity, $key));
     }
 
-    public function getAllByFilter(string $filter): array
+    public function getAllByFilter(IEntity $entity, string $filter): array
     {
         $this->filter = rawurlencode($filter);
         $this->all = true;
-        return $this->getAll();
+        return $this->getAll($entity);
     }
 
-    public function getFirstByFilter(string $filter): array
+    public function getFirstByFilter(IEntity $entity, string $filter): array
     {
         $this->top = '&$top=1';
-        return $this->getAllByFilter($filter);
+        return $this->getAllByFilter($entity, $filter);
     }
 
-    public function create(array $data): array
+    public function create(IEntity $entity, array $data): array
     {
-       return $this->request('POST',$this->buildUrl($this->endpoint(),false), $data);
+       return $this->request('POST',$this->buildUrl($entity,false), $data);
     }
 
-    public function update($key, array $data): void
+    public function update(IEntity $entity, $key, array $data): void
     {
-        $this->request('PATCH', $this->buildUrl($this->endpoint() . "($key)", false), $data);
+        $this->request('PATCH', $this->buildUrl($entity, $key, false), $data);
     }
 
-    public function delete($key): void
+    public function delete(IEntity $entity, $key): void
     {
-        $this->request('DELETE',$this->buildUrl($this->endpoint() . "($key)", false));
+        $this->request('DELETE',$this->buildUrl($entity, $key, false));
     }
 
-    public function updateByBatch(array $data): array
+    public function updateByBatch(IEntity $entity, array $data): array
     {
-
+        return [];
     }
 }

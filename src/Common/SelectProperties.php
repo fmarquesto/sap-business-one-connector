@@ -2,11 +2,18 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Common;
 
-use fmarquesto\SapBusinessOneConnector\ISAPConnector;
+use fmarquesto\SapBusinessOneConnector\Entities\IEntity;
 
 trait SelectProperties
 {
-    public function setSelect($property): ISAPConnector
+    protected array $selectProperties = [];
+
+    public function selectProperties():array
+    {
+        return $this->selectProperties;
+    }
+
+    public function setSelect($property): IEntity
     {
         if(count($this->selectProperties) == 0)
             $this->selectProperties = $this->defaultSelect();
@@ -14,7 +21,7 @@ trait SelectProperties
         return $this;
     }
 
-    public function setMultipleSelect(array $properties): ISAPConnector
+    public function setMultipleSelect(array $properties): IEntity
     {
         foreach($properties as  $property)
             $this->setSelect($property);
