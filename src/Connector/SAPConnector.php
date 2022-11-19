@@ -5,6 +5,7 @@ namespace fmarquesto\SapBusinessOneConnector\Connector;
 use Dotenv\Dotenv;
 use fmarquesto\SapBusinessOneConnector\Entities\IEntity;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 class SAPConnector implements ISAPConnector
 {
@@ -33,7 +34,7 @@ class SAPConnector implements ISAPConnector
 
     private function loadCredentialsFromEnvironment(): void
     {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
         $dotenv->load();
         $dotenv->required(['SAP_HOST', 'SAP_PORT', 'SAP_USER', 'SAP_PASS', 'SAP_DB']);
         $this->loadCredentialsFromArry($_ENV);
@@ -86,7 +87,7 @@ class SAPConnector implements ISAPConnector
     }
 
     /**
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function login(): void
     {
@@ -98,7 +99,7 @@ class SAPConnector implements ISAPConnector
     }
 
     /**
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function logout(): void
     {
