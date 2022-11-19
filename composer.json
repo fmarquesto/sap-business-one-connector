@@ -1,0 +1,23 @@
+{
+    "name": "fmarquesto/sap-business-one-connector",
+    "description": "Utility to connect with SAPB1",
+    "type": "library",
+    "require": {
+        "guzzlehttp/guzzle": "^7.5",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "vlucas/phpdotenv": "^5.5"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "fmarquesto\\SapBusinessOneConnector\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Fede Marquesto",
+            "email": "fede.marquesto@gmail.com"
+        }
+    ]
+}
