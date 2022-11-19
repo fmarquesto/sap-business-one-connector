@@ -3,10 +3,13 @@
 namespace fmarquesto\SapBusinessOneConnector;
 
 use Dotenv\Dotenv;
+use fmarquesto\SapBusinessOneConnector\Common\SelectProperties;
 use GuzzleHttp\Client;
 
 abstract class SAPConnector implements ISAPConnector
 {
+    use SelectProperties;
+
     private static string $baseVersionUrl = '/b1s/v1/';
     private string $host;
     private int $port;
@@ -118,5 +121,42 @@ abstract class SAPConnector implements ISAPConnector
     private function top(): string
     {
         return $this->top;
+    }
+
+    public function getAll(): array
+    {
+        return $this->get($this->endpoint());
+    }
+
+    public function getOneByKey($key): array
+    {
+        return $this->get($this->endpoint() . "($key)");
+    }
+
+    public function getAllByFilter(string $filter): array
+    {
+        $this->filter = rawurlencode($filter);
+        return $this->getAll();
+    }
+
+    public function getFirstByFilter(string $filter): array
+    {
+        $this->top = '&$top=1';
+        return $this->getAllByFilter($filter);
+    }
+
+    public function create(array $data): array
+    {
+        // TODO: Implement create() method.
+    }
+
+    public function update($key, $data): void
+    {
+        // TODO: Implement update() method.
+    }
+
+    public function delete($key): void
+    {
+        // TODO: Implement delete() method.
     }
 }
