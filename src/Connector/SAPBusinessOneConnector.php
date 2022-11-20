@@ -3,7 +3,7 @@
 namespace fmarquesto\SapBusinessOneConnector\Connector;
 
 use Dotenv\Dotenv;
-use fmarquesto\SapBusinessOneConnector\Entities\IEntity;
+use fmarquesto\SapBusinessOneConnector\Repositories\IEntity;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 

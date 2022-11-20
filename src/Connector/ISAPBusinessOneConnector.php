@@ -2,7 +2,7 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Connector;
 
-use fmarquesto\SapBusinessOneConnector\Entities\IEntity;
+use fmarquesto\SapBusinessOneConnector\Repositories\IEntity;
 
 interface ISAPConnector
 {

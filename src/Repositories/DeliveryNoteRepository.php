@@ -1,6 +1,6 @@
 <?php
 
-namespace fmarquesto\SapBusinessOneConnector\Entities;
+namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
 class DeliveryNoteDocuments extends Documents
 {

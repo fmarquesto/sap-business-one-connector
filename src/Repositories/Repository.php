@@ -1,6 +1,6 @@
 <?php
 
-namespace fmarquesto\SapBusinessOneConnector\Entities;
+namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
 use fmarquesto\SapBusinessOneConnector\Common\SelectProperties;
 use fmarquesto\SapBusinessOneConnector\Connector\ISAPConnector;
