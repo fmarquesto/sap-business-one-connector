@@ -2,7 +2,7 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
-abstract class Documents extends Entity
+abstract class DocumentRepository extends Repository
 {
     function key(): string
     {

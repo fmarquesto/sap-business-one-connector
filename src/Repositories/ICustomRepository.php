@@ -2,7 +2,7 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
-interface ICustomEntity
+interface ICustomRepository
 {
     function setEndpoint(string $endpoint):void;
 

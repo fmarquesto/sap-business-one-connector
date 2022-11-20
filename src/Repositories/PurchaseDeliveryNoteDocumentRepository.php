@@ -2,7 +2,7 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
-class PurchaseDeliveryNoteDocuments extends Documents
+class PurchaseDeliveryNoteDocumentRepository extends DocumentRepository
 {
     public function endpoint(): string
     {

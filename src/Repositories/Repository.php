@@ -3,15 +3,15 @@
 namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
 use fmarquesto\SapBusinessOneConnector\Common\SelectProperties;
-use fmarquesto\SapBusinessOneConnector\Connector\ISAPConnector;
+use fmarquesto\SapBusinessOneConnector\Connector\ISAPBusinessOneConnector;
 
-abstract class Entity implements IEntity
+abstract class Repository implements IRepository
 {
     use SelectProperties;
 
-    protected ISAPConnector $connector;
+    protected ISAPBusinessOneConnector $connector;
 
-    public function __construct(ISAPConnector $connector)
+    public function __construct(ISAPBusinessOneConnector $connector)
     {
         $this->connector = $connector;
     }

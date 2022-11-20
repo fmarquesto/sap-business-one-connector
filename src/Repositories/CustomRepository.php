@@ -1,13 +1,13 @@
 <?php
 
-namespace fmarquesto\SapBusinessOneConnector\Entities;
+namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
-use fmarquesto\SapBusinessOneConnector\Connector\ISAPConnector;
+use fmarquesto\SapBusinessOneConnector\Connector\ISAPBusinessOneConnector;
 use fmarquesto\SapBusinessOneConnector\Exceptions\NoDefaultSelectException;
 use fmarquesto\SapBusinessOneConnector\Exceptions\NoEndpointException;
 use fmarquesto\SapBusinessOneConnector\Exceptions\NoKeyException;
 
-class CustomEntity extends Entity implements ICustomEntity
+class CustomRepository extends Repository implements ICustomRepository
 {
     private string $endpoint;
     private $key;
@@ -18,7 +18,7 @@ class CustomEntity extends Entity implements ICustomEntity
      * @throws NoEndpointException
      * @throws NoKeyException
      */
-    public function __construct(ISAPConnector $connector, string $endpoint, $key, array $defaultSelect)
+    public function __construct(ISAPBusinessOneConnector $connector, string $endpoint, $key, array $defaultSelect)
     {
         $this->setEndpoint($endpoint);
         $this->setKey($key);

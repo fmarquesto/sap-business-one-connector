@@ -2,7 +2,7 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
-class OrderDocuments extends Documents
+class OrderDocumentRepository extends DocumentRepository
 {
     public function endpoint(): string
     {

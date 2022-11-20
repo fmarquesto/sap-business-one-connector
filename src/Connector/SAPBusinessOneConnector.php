@@ -3,11 +3,11 @@
 namespace fmarquesto\SapBusinessOneConnector\Connector;
 
 use Dotenv\Dotenv;
-use fmarquesto\SapBusinessOneConnector\Repositories\IEntity;
+use fmarquesto\SapBusinessOneConnector\Repositories\IRepository;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
-class SAPConnector implements ISAPConnector
+class SAPBusinessOneConnector implements ISAPBusinessOneConnector
 {
     private static string $baseVersionUrl = '/b1s/v1/';
     private string $host;
@@ -74,7 +74,7 @@ class SAPConnector implements ISAPConnector
         return $this->getBaseUrl() . 'Logout';
     }
 
-    protected function buildUrl(IEntity $entity, $key = '', $get = true): string
+    protected function buildUrl(IRepository $entity, $key = '', $get = true): string
     {
         $url = $this->getBaseUrl() . $entity->endpoint();
         if($key!='')
@@ -114,7 +114,7 @@ class SAPConnector implements ISAPConnector
         return json_decode($response->getBody()->__toString(), true)??[];
     }
 
-    private function select(IEntity $entity): string
+    private function select(IRepository $entity): string
     {
         $select = '$select=';
         if(count($entity->selectProperties()) > 0){
@@ -141,46 +141,46 @@ class SAPConnector implements ISAPConnector
         return $top;
     }
 
-    public function getAll(IEntity $entity): array
+    public function getAll(IRepository $entity): array
     {
         $this->all = true;
         return $this->request('GET', $this->buildUrl($entity))['value']??[];
     }
 
-    public function getOneByKey(IEntity $entity, $key): array
+    public function getOneByKey(IRepository $entity, $key): array
     {
         return $this->request('GET', $this->buildUrl($entity, $key));
     }
 
-    public function getAllByFilter(IEntity $entity, string $filter): array
+    public function getAllByFilter(IRepository $entity, string $filter): array
     {
         $this->filter = rawurlencode($filter);
         $this->all = true;
         return $this->getAll($entity);
     }
 
-    public function getFirstByFilter(IEntity $entity, string $filter): array
+    public function getFirstByFilter(IRepository $entity, string $filter): array
     {
         $this->top = '&$top=1';
         return $this->getAllByFilter($entity, $filter);
     }
 
-    public function create(IEntity $entity, array $data): array
+    public function create(IRepository $entity, array $data): array
     {
        return $this->request('POST',$this->buildUrl($entity,false), $data);
     }
 
-    public function update(IEntity $entity, $key, array $data): void
+    public function update(IRepository $entity, $key, array $data): void
     {
         $this->request('PATCH', $this->buildUrl($entity, $key, false), $data);
     }
 
-    public function delete(IEntity $entity, $key): void
+    public function delete(IRepository $entity, $key): void
     {
         $this->request('DELETE',$this->buildUrl($entity, $key, false));
     }
 
-    public function updateByBatch(IEntity $entity, array $data): array
+    public function updateByBatch(IRepository $entity, array $data): array
     {
         return [];
     }

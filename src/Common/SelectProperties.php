@@ -2,7 +2,7 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Common;
 
-use fmarquesto\SapBusinessOneConnector\Entities\IEntity;
+use fmarquesto\SapBusinessOneConnector\Repositories\IRepository;
 
 trait SelectProperties
 {
@@ -13,7 +13,7 @@ trait SelectProperties
         return $this->selectProperties;
     }
 
-    public function setSelect($property): IEntity
+    public function setSelect($property): IRepository
     {
         if(count($this->selectProperties) == 0)
             $this->selectProperties = $this->defaultSelect();
@@ -21,7 +21,7 @@ trait SelectProperties
         return $this;
     }
 
-    public function setMultipleSelect(array $properties): IEntity
+    public function setMultipleSelect(array $properties): IRepository
     {
         foreach($properties as  $property)
             $this->setSelect($property);

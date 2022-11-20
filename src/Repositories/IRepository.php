@@ -2,11 +2,11 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
-interface IEntity
+interface IRepository
 {
-    public function setSelect(string $property): IEntity;
+    public function setSelect(string $property): IRepository;
 
-    public function setMultipleSelect(array $properties): IEntity;
+    public function setMultipleSelect(array $properties): IRepository;
 
     function endpoint(): string;
 

@@ -2,7 +2,7 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
-class Manufacturers extends Entity
+class ManufacturerRepository extends Repository
 {
     public function endpoint(): string
     {

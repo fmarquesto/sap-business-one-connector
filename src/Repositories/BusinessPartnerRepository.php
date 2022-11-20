@@ -1,8 +1,8 @@
 <?php
 
-namespace fmarquesto\SapBusinessOneConnector\Entities;
+namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
-class BusinessPartners extends Entity
+class BusinessPartnerRepository extends Repository
 {
     function endpoint(): string
     {

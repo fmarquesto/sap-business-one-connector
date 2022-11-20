@@ -1,8 +1,8 @@
 <?php
 
-namespace fmarquesto\SapBusinessOneConnector\Entities;
+namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
-class Items extends Entity
+class ItemRepository extends Repository
 {
     public function getOneByKey($key): array
     {
