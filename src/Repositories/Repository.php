@@ -3,55 +3,55 @@
 namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
 use fmarquesto\SapBusinessOneConnector\Common\SelectProperties;
-use fmarquesto\SapBusinessOneConnector\Connector\ISAPBusinessOneConnector;
+use fmarquesto\SapBusinessOneConnector\Connector\SAPManager;
 
 abstract class Repository implements IRepository
 {
     use SelectProperties;
 
-    protected ISAPBusinessOneConnector $connector;
+    protected SAPManager $SAPManager;
 
-    public function __construct(ISAPBusinessOneConnector $connector)
+    public function __construct(SAPManager $SAPManager)
     {
-        $this->connector = $connector;
+        $this->SAPManager = $SAPManager;
     }
     public function getAll(): array
     {
-        return $this->connector->getAll($this);
+        return $this->SAPManager->getAll($this);
     }
 
     public function getOneByKey($key): array
     {
-        return $this->connector->getOneByKey($this, $key);
+        return $this->SAPManager->getOneByKey($this, $key);
     }
 
     public function getAllByFilter(string $filter): array
     {
-        return $this->connector->getAllByFilter($this, $filter);
+        return $this->SAPManager->getAllByFilter($this, $filter);
     }
 
     public function getFirstByFilter(string $filter): array
     {
-        return $this->connector->getFirstByFilter($this, $filter);
+        return $this->SAPManager->getFirstByFilter($this, $filter);
     }
 
     public function create(array $data): array
     {
-        return $this->connector->create($this, $data);
+        return $this->SAPManager->create($this, $data);
     }
 
     public function update($key, array $data): void
     {
-        $this->connector->update($this, $key, $data);
+        $this->SAPManager->update($this, $key, $data);
     }
 
     public function delete($key): void
     {
-        $this->connector->delete($this, $key);
+        $this->SAPManager->delete($this, $key);
     }
 
     public function updateByBatch(array $data): array
     {
-        return $this->connector->updateByBatch($this, $data);
+        return $this->SAPManager->updateByBatch($this, $data);
     }
 }

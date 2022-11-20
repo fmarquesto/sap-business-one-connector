@@ -3,7 +3,6 @@
 namespace fmarquesto\SapBusinessOneConnector\Connector;
 
 use Dotenv\Dotenv;
-use fmarquesto\SapBusinessOneConnector\Repositories\IRepository;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -18,9 +17,6 @@ class SAPBusinessOneConnector implements ISAPBusinessOneConnector
 
     protected Client $sapClient;
     private array $sessionLogin = [];
-    protected string $filter = '';
-    protected string $top = '';
-    protected bool $all = false;
 
     function __construct($connectionConfig = [])
     {
@@ -74,114 +70,38 @@ class SAPBusinessOneConnector implements ISAPBusinessOneConnector
         return $this->getBaseUrl() . 'Logout';
     }
 
-    protected function buildUrl(IRepository $entity, $key = '', $get = true): string
-    {
-        $url = $this->getBaseUrl() . $entity->endpoint();
-        if($key!='')
-            $url .="($key)";
-
-        if($get)
-            $url .= "?" . $this->select($entity) . $this->filter() . $this->top();
-
-        return $url;
-    }
-
     /**
      * @throws GuzzleException
      */
-    public function login(): void
+    private function login(): void
     {
         $res = $this->sapClient->post($this->getLoginUrl(), ['json' => $this->getCredentials()]);
         $this->sessionLogin['Cookie'] = implode(';',$res->getHeader('Set-Cookie'));
-        if($this->all)
-            $this->sessionLogin['Prefer'] = 'odata.maxpagesize=0';
-        $this->all = false;
     }
 
     /**
      * @throws GuzzleException
      */
-    public function logout(): void
+    private function logout(): void
     {
         $this->sapClient->get($this->getLogoutUrl(),['headers'=>$this->sessionLogin]);
     }
 
-    protected function request(string $method, string $url, array $data = []): array
+    public function execute(string $method, string $url, array $data = []): array
     {
         $this->login();
-        $response = $this->sapClient->request($method, $url, ['json' => $data, 'headers' => $this->sessionLogin]);
+        $response = $this->sapClient->request($method, $this->getBaseUrl() . $url, ['json' => $data, 'headers' => $this->sessionLogin]);
         $this->logout();
+        $this->sessionLogin = [];
         return json_decode($response->getBody()->__toString(), true)??[];
     }
 
-    private function select(IRepository $entity): string
+    /**
+     * @return void
+     */
+    public function setGetAllHeader(bool $all): void
     {
-        $select = '$select=';
-        if(count($entity->selectProperties()) > 0){
-            $select .= implode(',',$entity->selectProperties());
-        }else{
-            $select .= implode(',',$entity->defaultSelect());
-        }
-        return $select;
-    }
-
-    private function filter(): string
-    {
-        $filter = '';
-        if($this->filter != '')
-            $filter = '&$filter=' . $this->filter;
-        $this->filter = '';
-        return $filter;
-    }
-
-    private function top(): string
-    {
-        $top = $this->top;
-        $this->top = '';
-        return $top;
-    }
-
-    public function getAll(IRepository $entity): array
-    {
-        $this->all = true;
-        return $this->request('GET', $this->buildUrl($entity))['value']??[];
-    }
-
-    public function getOneByKey(IRepository $entity, $key): array
-    {
-        return $this->request('GET', $this->buildUrl($entity, $key));
-    }
-
-    public function getAllByFilter(IRepository $entity, string $filter): array
-    {
-        $this->filter = rawurlencode($filter);
-        $this->all = true;
-        return $this->getAll($entity);
-    }
-
-    public function getFirstByFilter(IRepository $entity, string $filter): array
-    {
-        $this->top = '&$top=1';
-        return $this->getAllByFilter($entity, $filter);
-    }
-
-    public function create(IRepository $entity, array $data): array
-    {
-       return $this->request('POST',$this->buildUrl($entity,false), $data);
-    }
-
-    public function update(IRepository $entity, $key, array $data): void
-    {
-        $this->request('PATCH', $this->buildUrl($entity, $key, false), $data);
-    }
-
-    public function delete(IRepository $entity, $key): void
-    {
-        $this->request('DELETE',$this->buildUrl($entity, $key, false));
-    }
-
-    public function updateByBatch(IRepository $entity, array $data): array
-    {
-        return [];
+        if ($all)
+            $this->sessionLogin['Prefer'] = 'odata.maxpagesize=0';
     }
 }

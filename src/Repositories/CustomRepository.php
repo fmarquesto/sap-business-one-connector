@@ -2,7 +2,7 @@
 
 namespace fmarquesto\SapBusinessOneConnector\Repositories;
 
-use fmarquesto\SapBusinessOneConnector\Connector\ISAPBusinessOneConnector;
+use fmarquesto\SapBusinessOneConnector\Connector\SAPManager;
 use fmarquesto\SapBusinessOneConnector\Exceptions\NoDefaultSelectException;
 use fmarquesto\SapBusinessOneConnector\Exceptions\NoEndpointException;
 use fmarquesto\SapBusinessOneConnector\Exceptions\NoKeyException;
@@ -18,12 +18,12 @@ class CustomRepository extends Repository implements ICustomRepository
      * @throws NoEndpointException
      * @throws NoKeyException
      */
-    public function __construct(ISAPBusinessOneConnector $connector, string $endpoint, $key, array $defaultSelect)
+    public function __construct(SAPManager $SAPManager, string $endpoint, $key, array $defaultSelect)
     {
         $this->setEndpoint($endpoint);
         $this->setKey($key);
         $this->setDefaultSelect($defaultSelect);
-        parent::__construct($connector);
+        parent::__construct($SAPManager);
     }
 
     function endpoint(): string
