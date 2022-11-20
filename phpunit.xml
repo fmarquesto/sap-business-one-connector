@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="true" bootstrap="vendor/autoload.php">
+    <testsuites>
+        <testsuite name="sap-business-one-connector">
+            <directory>./tests/</directory>
+        </testsuite>
+    </testsuites>
+    <coverage>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </coverage>
+    <php>
+        <env name="SAP_HOST" value="http://fake"/>
+        <env name="SAP_PORT" value="30000"/>
+        <env name="SAP_USER" value="user"/>
+        <env name="SAP_PASS" value="pass"/>
+        <env name="SAP_DB" value="db"/>
+    </php>
+</phpunit>

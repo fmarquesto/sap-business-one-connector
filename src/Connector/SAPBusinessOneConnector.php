@@ -3,7 +3,6 @@
 namespace fmarquesto\SapBusinessOneConnector\Connector;
 
 use Dotenv\Dotenv;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
 class SAPBusinessOneConnector implements ISAPBusinessOneConnector
@@ -15,17 +14,18 @@ class SAPBusinessOneConnector implements ISAPBusinessOneConnector
     private string $pass;
     private string $database;
 
-    protected Client $sapClient;
-    private array $sessionLogin = [];
+    protected ISAPClient $sapClient;
+    private array $sessionHeder = [];
+    private array $pageSizeHeader = [];
 
-    function __construct($connectionConfig = [])
+    function __construct(ISAPClient $client, array $connectionConfig = [])
     {
         if(empty($connectionConfig)){
             $this->loadCredentialsFromEnvironment();
         }else{
             $this->loadCredentialsFromArry($connectionConfig);
         }
-        $this->sapClient = new Client(['verify' => false]);
+        $this->sapClient = $client;
     }
 
     private function loadCredentialsFromEnvironment(): void
@@ -75,8 +75,8 @@ class SAPBusinessOneConnector implements ISAPBusinessOneConnector
      */
     private function login(): void
     {
-        $res = $this->sapClient->post($this->getLoginUrl(), ['json' => $this->getCredentials()]);
-        $this->sessionLogin['Cookie'] = implode(';',$res->getHeader('Set-Cookie'));
+        $res = $this->sapClient->login($this->getLoginUrl(), ['json' => $this->getCredentials()]);
+        $this->sessionHeder['Cookie'] = implode(';',$res['Set-Cookie']);
     }
 
     /**
@@ -84,24 +84,31 @@ class SAPBusinessOneConnector implements ISAPBusinessOneConnector
      */
     private function logout(): void
     {
-        $this->sapClient->get($this->getLogoutUrl(),['headers'=>$this->sessionLogin]);
+        $this->sapClient->logout($this->getLogoutUrl(),['headers'=>$this->sessionHeder]);
     }
 
     public function execute(string $method, string $url, array $data = []): array
     {
         $this->login();
-        $response = $this->sapClient->request($method, $this->getBaseUrl() . $url, ['json' => $data, 'headers' => $this->sessionLogin]);
+        $response = $this->sapClient->execute($method, $this->getBaseUrl() . $url,
+            [
+                'json' => $data,
+                'headers' => array_merge($this->sessionHeder, $this->pageSizeHeader)
+            ]);
         $this->logout();
-        $this->sessionLogin = [];
-        return json_decode($response->getBody()->__toString(), true)??[];
+        $this->resetHeaders();
+        return $response;
     }
 
-    /**
-     * @return void
-     */
-    public function setGetAllHeader(bool $all): void
+    public function setPageSizeHeader(int $pageSize): void
     {
-        if ($all)
-            $this->sessionLogin['Prefer'] = 'odata.maxpagesize=0';
+        $this->pageSizeHeader['Prefer'] = 'odata.maxpagesize=' . $pageSize;
     }
+
+    private function resetHeaders(): void
+    {
+        $this->sessionHeder = [];
+        $this->pageSizeHeader = [];
+    }
+
 }

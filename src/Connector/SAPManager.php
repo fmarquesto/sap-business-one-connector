@@ -7,7 +7,7 @@ use fmarquesto\SapBusinessOneConnector\Repositories\IRepository;
 class SAPManager
 {
     protected string $filter = '';
-    protected string $top = '';
+    protected int $top = 0;
     private SAPBusinessOneConnector $SAPConnector;
 
     function __construct(SAPBusinessOneConnector $SAPConnector)
@@ -15,7 +15,7 @@ class SAPManager
         $this->SAPConnector = $SAPConnector;
     }
 
-    protected function buildUrl(IRepository $entity, $key = '', $get = true): string
+    private function buildUrl(IRepository $entity, $key = '', $get = true): string
     {
         $url =  $entity->endpoint();
         if($key!='')
@@ -30,7 +30,7 @@ class SAPManager
     private function select(IRepository $entity): string
     {
         $select = '$select=';
-        if(count($entity->selectProperties()) > 0){
+        if(!empty($entity->selectProperties())){
             $select .= implode(',',$entity->selectProperties());
         }else{
             $select .= implode(',',$entity->defaultSelect());
@@ -49,13 +49,19 @@ class SAPManager
 
     private function top(): string
     {
-        $top = $this->top;
-        $this->top = '';
+        $top = $this->top>0? '&$top=' . $this->top : '';
+        $this->top = 0;
         return $top;
     }
+
+    public function setTop(int $top): void
+    {
+        $this->top = $top;
+    }
+
     public function getAll(IRepository $entity): array
     {
-        $this->SAPConnector->setGetAllHeader(true);
+        $this->SAPConnector->setPageSizeHeader(0);
         return $this->SAPConnector->execute('GET', $this->buildUrl($entity))['value']??[];
     }
 
@@ -72,13 +78,13 @@ class SAPManager
 
     public function getFirstByFilter(IRepository $entity, string $filter): array
     {
-        $this->top = '&$top=1';
+        $this->setTop(1);
         return $this->getAllByFilter($entity, $filter);
     }
 
     public function create(IRepository $entity, array $data): array
     {
-        return $this->SAPConnector->execute('POST',$this->buildUrl($entity,false), $data);
+        return $this->SAPConnector->execute('POST',$this->buildUrl($entity,'', false), $data);
     }
 
     public function update(IRepository $entity, $key, array $data): void
