@@ -19,16 +19,15 @@ class SAPManagerTest extends TestCase
 
     public function testGetAllItems()
     {
-        $items = m::mock(ItemRepository::class);
+        $this->expectNotToPerformAssertions();
+        $items = m::spy(ItemRepository::class);
         $items->shouldReceive('endpoint')->andReturn('Items');
         $items->shouldReceive('selectProperties')->andReturn(['ItemCode']);
 
-        $this->connector->shouldReceive('execute')->withArgs(function($method, $url){
-            $this->assertEquals('Items?$select=ItemCode', $url);
-            $this->assertEquals('GET', $method);
-            return true;
-        });
-        $res = $this->manager->getAll($items);
+        $this->manager->getAll($items);
+
+        $this->connector->shouldHaveReceived('execute', ['GET', 'Items?$select=ItemCode']);
+
     }
 
     public function testGetOneItemByKey()
@@ -103,7 +102,6 @@ class SAPManagerTest extends TestCase
 
     public function testDelete()
     {
-        $fakeObj = ['ItemCode' => '101', 'ItemName'=> 'Name'];
         $items = m::mock(ItemRepository::class);
         $items->shouldReceive('endpoint')->andReturn('Items');
         $this->connector->shouldReceive('execute')->withArgs(function($method, $url) use($fakeObj){
@@ -111,7 +109,7 @@ class SAPManagerTest extends TestCase
             $this->assertEquals('DELETE', $method);
             return true;
         });
-        $this->manager->delete($items, "'key'", $fakeObj);
+        $this->manager->delete($items, "'key'");
     }
 
     public function testUpdateBatch()
