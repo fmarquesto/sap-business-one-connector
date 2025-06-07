@@ -15,4 +15,14 @@ readonly class ConnectionData implements JsonSerializable
     {
         return get_object_vars($this);
     }
+
+    public function loginData(): array
+    {
+        return [
+            'CompanyDB' => $this->companyDB,
+            'UserName' => $this->userName,
+            'Password' => $this->password,
+            'Language' => $this->language,
+        ];
+    }
 }
