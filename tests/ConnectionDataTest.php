@@ -13,7 +13,10 @@ class ConnectionDataTest extends TestCase
         $credentials = $connectionData->loginData();
 
         $this->assertArrayHasKey('CompanyDB', $credentials);
+        $this->assertEquals('someCompanyDB', $credentials['CompanyDB']);
         $this->assertArrayHasKey('UserName', $credentials);
+        $this->assertEquals('someUserName', $credentials['UserName']);
         $this->assertArrayHasKey('Password', $credentials);
+        $this->assertEquals('somePassword', $credentials['Password']);
     }
 }
