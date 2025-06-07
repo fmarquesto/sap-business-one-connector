@@ -16,7 +16,7 @@ class Client implements InteractsWithSAP
 
     public function __construct(\GuzzleHttp\Client $client = null, array $connectionData = [])
     {
-        $this->client = $client ?? new \GuzzleHttp\Client(['verify' => false, 'http_errors'=>false, 'headers' => ['Accept' => 'application/json' ]]);
+        $this->client = $client ?? new \GuzzleHttp\Client(['verify' => false, 'http_errors' => false, 'headers' => ['Accept' => 'application/json' ]]);
 
         $this->connectionData = empty($connectionConfig) ?
             $this->loadCredentialsFromEnvironment() :
