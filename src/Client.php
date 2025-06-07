@@ -16,53 +16,12 @@ class Client implements InteractsWithSAP
 
     public function __construct(\GuzzleHttp\Client $client = null, array $connectionData = [])
     {
-        $this->client = $client ?? new \GuzzleHttp\Client(['verify' => false]);
+        $this->client = $client ?? new \GuzzleHttp\Client(['verify' => false, 'http_errors'=>false, 'headers' => ['Accept' => 'application/json' ]]);
 
         $this->connectionData = empty($connectionConfig) ?
             $this->loadCredentialsFromEnvironment() :
             $this->loadCredentialsFromArray($connectionData);
 
-    }
-
-    public function execute(QueryBuilder $queryBuilder, string $method = 'GET'): Response
-    {
-        $this->login();
-        $response = $this->client->request($method, $this->baseUrl() . $queryBuilder->buildUrl(), [
-            'json' => $queryBuilder->params,
-            'headers' => array_merge($this->sessionHeader, ['Content-Type' => 'application/json'], $this->pageSizeHeader)
-        ]);
-
-        $this->logout();
-        $this->resetHeaders();
-
-        return new Response($response);
-    }
-
-    private function login(): bool
-    {
-        $response = $this->client->post($this->baseUrl() . 'Login', ['json' => $this->connectionData->loginData()]);
-        $headers = $response->getHeaders();
-        $this->sessionHeader['Cookie'] = implode(';', $headers['Set-Cookie']);
-
-        return true;
-    }
-
-    private function logout(): bool
-    {
-        $this->client->post($this->baseUrl() . 'Logout', ['headers' => $this->sessionHeader]);
-
-        return true;
-    }
-
-    private function resetHeaders(): void
-    {
-        $this->sessionHeader = [];
-        $this->pageSizeHeader = [];
-    }
-
-    private function baseUrl(): string
-    {
-        return rtrim($this->connectionData->host, '/') . ':' . $this->connectionData->port . '/b1s/v1/';
     }
 
     private function loadCredentialsFromEnvironment(): ConnectionData
@@ -83,5 +42,48 @@ class Client implements InteractsWithSAP
             $data['SAP_USER'],
             $data['SAP_PASS'],
         );
+    }
+
+    public function execute(QueryBuilder $queryBuilder, string $method = 'GET'): Response
+    {
+        try {
+            $this->login();
+            $response = $this->client->request($method, $this->baseUrl() . $queryBuilder->buildUrl(), [
+                'json' => $queryBuilder->params,
+                'headers' => array_merge($this->sessionHeader, ['Content-Type' => 'application/json'], $this->pageSizeHeader)
+            ]);
+            return new Response($response);
+        } finally {
+            $this->logout();
+            $this->resetHeaders();
+        }
+
+    }
+
+    private function login(): bool
+    {
+        $response = $this->client->post($this->baseUrl() . 'Login', ['json' => $this->connectionData->loginData()]);
+        $headers = $response->getHeaders();
+        $this->sessionHeader['Cookie'] = implode(';', $headers['Set-Cookie']);
+
+        return $response->getStatusCode();
+    }
+
+    private function baseUrl(): string
+    {
+        return rtrim($this->connectionData->host, '/') . ':' . $this->connectionData->port . '/b1s/v1/';
+    }
+
+    private function logout(): bool
+    {
+        $response = $this->client->post($this->baseUrl() . 'Logout', ['headers' => $this->sessionHeader]);
+
+        return $response->getStatusCode();
+    }
+
+    private function resetHeaders(): void
+    {
+        $this->sessionHeader = [];
+        $this->pageSizeHeader = [];
     }
 }
