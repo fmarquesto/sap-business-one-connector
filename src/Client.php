@@ -40,7 +40,7 @@ class Client implements InteractsWithSAP
 
     private function login(): bool
     {
-        $response = $this->client->post($this->baseUrl() . 'Login', ['json' => json_encode($this->connectionData)]);
+        $response = $this->client->post($this->baseUrl() . 'Login', ['json' => $this->connectionData->loginData()]);
         $headers = $response->getHeaders();
         $this->sessionHeader['Cookie'] = implode(';', $headers['Set-Cookie']);
 
@@ -67,7 +67,7 @@ class Client implements InteractsWithSAP
 
     private function loadCredentialsFromEnvironment(): ConnectionData
     {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
         $dotenv->safeLoad();
         $dotenv->required(['SAP_HOST', 'SAP_PORT', 'SAP_USER', 'SAP_PASS', 'SAP_DB']);
 
@@ -79,9 +79,9 @@ class Client implements InteractsWithSAP
         return new ConnectionData(
             $data['SAP_HOST'],
             $data['SAP_PORT'],
+            $data['SAP_DB'],
             $data['SAP_USER'],
             $data['SAP_PASS'],
-            $data['SAP_DB']
         );
     }
 }

@@ -4,7 +4,7 @@ namespace Tests;
 
 use fmarquesto\SapBusinessOneConnector\Client;
 use fmarquesto\SapBusinessOneConnector\QueryBuilder;
-use \fmarquesto\SapBusinessOneConnector\Response;
+use fmarquesto\SapBusinessOneConnector\Response;
 use PHPUnit\Framework\TestCase;
 use Mockery as m;
 
@@ -14,15 +14,17 @@ class ClientTest extends TestCase
     public function setUp(): void
     {
         $this->client = m::mock(\GuzzleHttp\Client::class);
-        $this->client->shouldReceive('post')->withArgs(function ($url, $headers) {
-            return $url == 'http://fake:30000/b1s/v1/Login';
-        })->andReturn(new \GuzzleHttp\Psr7\Response(200, [
-            'Set-Cookie' => $sessionHeader = 'ROUTEID=.node1; path=/b1s'
-        ]));
 
-        $this->client->shouldReceive('post')->withArgs(function ($url, $headers) use ($sessionHeader) {
-            return $url === 'http://fake:30000/b1s/v1/Logout' && $headers['headers']['Cookie'] === $sessionHeader;
-        });
+        //Login and logout mock
+        $this->client
+            ->shouldreceive('post')
+            ->with('http://fake:30000/b1s/v1/Login', ['json' => [ 'CompanyDB' => 'db', 'UserName' => 'user', 'Password' => 'pass', 'Language' => '23']])
+            ->andReturn(new \GuzzleHttp\Psr7\Response(200, ['Set-Cookie' => $sessionHeader = 'ROUTEID=.node1; path=/b1s']))
+            ->once();
+
+        $this->client->shouldReceive('post')->with('http://fake:30000/b1s/v1/Logout', ['headers' => ['Cookie' => $sessionHeader]])
+            ->andReturn(new \GuzzleHttp\Psr7\Response(200))
+            ->once();
     }
     public function test_execute_returns_response()
     {
