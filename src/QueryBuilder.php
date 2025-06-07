@@ -23,14 +23,14 @@ class QueryBuilder
         }
 
         if(!empty($this->filter)) {
-            $queryParams .= '&$filter=' . implode(' ', $this->filter);
+            $queryParams .= '&$filter=' . rawurlencode(implode(' ', $this->filter));
         }
 
         if($this->top > 0) {
             $queryParams .= '&$top=' . $this->top;
         }
 
-        return $this->uri . rawurlencode($queryParams);
+        return $this->uri . $queryParams;
     }
 
     public function addFilter(string ...$filter): self

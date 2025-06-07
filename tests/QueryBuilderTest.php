@@ -14,7 +14,7 @@ class QueryBuilderTest extends TestCase
 
         $url = $queryBuilder->buildUrl();
         $this->assertEquals(
-            rawurlencode('Items(ItemCode)?$select=ItemCode,ItemName&$filter=ItemCode eq \'123\''),
+            'Items(ItemCode)?$select=ItemCode,ItemName&$filter=' . rawurlencode('ItemCode eq \'123\''),
             $url
         );
     }
@@ -25,7 +25,7 @@ class QueryBuilderTest extends TestCase
 
         $url = $queryBuilder->buildUrl();
 
-        $this->assertEquals(rawurlencode('Items(ItemCode)'), $url);
+        $this->assertEquals('Items(ItemCode)', $url);
     }
 
     public function test_query_builder_builds_url_without_query_params(): void
