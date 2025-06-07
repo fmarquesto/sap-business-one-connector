@@ -4,6 +4,7 @@ namespace Tests;
 
 use fmarquesto\SapBusinessOneConnector\Client;
 use fmarquesto\SapBusinessOneConnector\QueryBuilder;
+use fmarquesto\SapBusinessOneConnector\Resources;
 use fmarquesto\SapBusinessOneConnector\Response;
 use PHPUnit\Framework\TestCase;
 use Mockery as m;
@@ -35,7 +36,7 @@ class ClientTest extends TestCase
                 'headers' => ['Cookie' => 'ROUTEID=.node1; path=/b1s', 'Content-Type' => 'application/json']
             ])
             ->andReturn(new \GuzzleHttp\Psr7\Response(200, [], json_encode(['data' => 'test'])));
-        $response = $client->execute(new QueryBuilder('Items'));
+        $response = $client->execute(new QueryBuilder(Resources::Items));
 
         $this->assertInstanceOf(Response::class, $response);
     }

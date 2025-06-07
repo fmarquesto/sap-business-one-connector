@@ -5,7 +5,7 @@ namespace fmarquesto\SapBusinessOneConnector;
 class QueryBuilder
 {
     public function __construct(
-        public readonly string $uri,
+        public readonly Resources $resource,
         public readonly string $key = '',
         public readonly array $params = [],
         private array $select = [],
@@ -16,7 +16,7 @@ class QueryBuilder
 
     public function buildUrl(): string
     {
-        $queryParams = $this->key !== ''? "($this->key)" : '';
+        $queryParams = $this->key !== '' ? "($this->key)" : '';
 
         if(!empty($this->select)) {
             $queryParams .= '?' . '$select=' . implode(',', $this->select);
@@ -30,7 +30,7 @@ class QueryBuilder
             $queryParams .= '&$top=' . $this->top;
         }
 
-        return $this->uri . $queryParams;
+        return $this->resource->value . $queryParams;
     }
 
     public function addFilter(string ...$filter): self
